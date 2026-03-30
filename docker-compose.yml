@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  sales-expert-plugin:
+    build: .
+    container_name: sales-expert-plugin
+    ports:
+      - "8080:8080"
+    environment:
+      - SALES_EXPERT_BASE_URL=${SALES_EXPERT_BASE_URL:-http://host.docker.internal:8000}
+      - PLUGIN_TIMEOUT_SECONDS=30
+    restart: unless-stopped
+    networks:
+      - sales-expert-net
+
+networks:
+  sales-expert-net:
+    name: sales-expert-net
