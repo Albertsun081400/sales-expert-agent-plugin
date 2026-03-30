@@ -4,6 +4,7 @@ Sales-Expert-Agent service so this plugin stays lightweight and in sync.
 """
 
 import httpx
+import uuid
 from typing import Optional
 from .config import SALES_EXPERT_BASE_URL, TIMEOUT_SECONDS
 from .schemas import (
@@ -29,12 +30,8 @@ class RemoteMemoryStore:
         collection_type: str = "private",
     ) -> str:
         """Hybrid retrieval via parent service internal endpoint (no auth)."""
-        # Add tenant_id to filter for multi-tenant isolation
-        if customer_filter is None:
-            customer_filter = {"tenant_id": tenant_id}
-        else:
-            customer_filter["tenant_id"] = tenant_id
-        
+        # customer_filter is a customer name string (not dict) per parent schema
+        # tenant_id is extracted server-side in the parent from request headers
         payload = {
             "query": query,
             "top_k": top_k,
@@ -58,6 +55,7 @@ class RemoteMemoryStore:
         collection_type: str = "private",
     ) -> None:
         """Sync conversation / profile fragments into parent service via internal endpoint."""
+        ids = [str(uuid.uuid4()) for _ in documents]
         payload = {
             "conversations": [
                 {
@@ -71,6 +69,7 @@ class RemoteMemoryStore:
             "customer_name": metadatas[0].get("customer_name") if metadatas else None,
             "profiles": [],
             "tenant_id": tenant_id,
+            "ids": ids,
         }
         with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
             resp = client.post(
