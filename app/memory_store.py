@@ -24,23 +24,27 @@ class RemoteMemoryStore:
         self,
         query: str,
         top_k: int = 4,
-        customer_filter: Optional[str] = None,
+        customer_filter: Optional[dict] = None,
         tenant_id: str = "default",
         collection_type: str = "private",
     ) -> str:
-        """Hybrid retrieval via parent service."""
+        """Hybrid retrieval via parent service internal endpoint (no auth)."""
+        # Add tenant_id to filter for multi-tenant isolation
+        if customer_filter is None:
+            customer_filter = {"tenant_id": tenant_id}
+        else:
+            customer_filter["tenant_id"] = tenant_id
+        
         payload = {
             "query": query,
             "top_k": top_k,
             "customer_filter": customer_filter,
             "collection_type": collection_type,
         }
-        headers = {"X-Tenant-ID": tenant_id}
         with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
             resp = client.post(
-                f"{self.base_url}/api/v1/retrieve",
+                f"{self.base_url}/api/v1/internal/retrieve",
                 json=payload,
-                headers=headers,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -53,7 +57,7 @@ class RemoteMemoryStore:
         tenant_id: str = "default",
         collection_type: str = "private",
     ) -> None:
-        """Sync conversation / profile fragments into parent service."""
+        """Sync conversation / profile fragments into parent service via internal endpoint."""
         payload = {
             "conversations": [
                 {
@@ -66,13 +70,12 @@ class RemoteMemoryStore:
             "session_id": metadatas[0].get("file_name", "unknown") if metadatas else None,
             "customer_name": metadatas[0].get("customer_name") if metadatas else None,
             "profiles": [],
+            "tenant_id": tenant_id,
         }
-        headers = {"X-Tenant-ID": tenant_id}
         with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
             resp = client.post(
-                f"{self.base_url}/api/v1/sync",
+                f"{self.base_url}/api/v1/internal/sync",
                 json=payload,
-                headers=headers,
             )
             resp.raise_for_status()
 
