@@ -1,0 +1,17 @@
+# AI Dojo Asset Standard Gitignore
+
+# Python internal
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Data & Cache
+.npm-cache/
+.chroma/
+*.db
+*.log
+
+# Sensitive
+.env
+auth_key.json
