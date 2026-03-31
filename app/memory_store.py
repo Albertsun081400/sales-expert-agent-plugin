@@ -30,12 +30,22 @@ class RemoteMemoryStore:
         collection_type: str = "private",
     ) -> str:
         """Hybrid retrieval via parent service internal endpoint (no auth)."""
-        # customer_filter is a customer name string (not dict) per parent schema
-        # tenant_id is extracted server-side in the parent from request headers
+        # Build proper customer_filter dict for parent service
+        filter_dict = None
+        if customer_filter:
+            if isinstance(customer_filter, str):
+                filter_dict = {"customer_name": customer_filter, "tenant_id": tenant_id}
+            elif isinstance(customer_filter, dict):
+                filter_dict = customer_filter
+                if "tenant_id" not in filter_dict:
+                    filter_dict["tenant_id"] = tenant_id
+        else:
+            filter_dict = {"tenant_id": tenant_id}
+        
         payload = {
             "query": query,
             "top_k": top_k,
-            "customer_filter": customer_filter,
+            "customer_filter": filter_dict,
             "collection_type": collection_type,
         }
         with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
