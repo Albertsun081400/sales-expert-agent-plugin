@@ -37,8 +37,8 @@ class RemoteMemoryStore:
                 filter_dict = {"customer_name": customer_filter, "tenant_id": tenant_id}
             elif isinstance(customer_filter, dict):
                 filter_dict = customer_filter
-                if "tenant_id" not in filter_dict:
-                    filter_dict["tenant_id"] = tenant_id
+                # Force overwrite with the authenticated tenant_id for strict isolation
+                filter_dict["tenant_id"] = tenant_id
         else:
             filter_dict = {"tenant_id": tenant_id}
         

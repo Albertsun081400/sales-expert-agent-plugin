@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 
 
 class RetrieveRequest(BaseModel):
     query: str
     top_k: int = 4
-    customer_filter: Optional[str] = None
+    customer_filter: Optional[Union[str, dict]] = None
     collection_type: str = "private"
 
 

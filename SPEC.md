@@ -128,7 +128,7 @@ ChromaDB (向量库)
 
 | Header | 值 | 说明 |
 |--------|----|------|
-| `X-Tenant-ID` | string | 租户ID，鉴权用。默认 `default` |
+| `X-Tenant-ID` | string | 租户层级凭证 (Scoped ID)，格式：`{tenant_id}/{user_id}`。默认 `default` |
 | `Content-Type` | application/json | POST 请求必须 |
 
 ### 2.4 多租户隔离

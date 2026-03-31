@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SALES_EXPERT_BASE_URL=${SALES_EXPERT_BASE_URL:-http://host.docker.internal:8000}
+      - SALES_EXPERT_BASE_URL=${SALES_EXPERT_BASE_URL:-http://host.docker.internal:8015}
       - PLUGIN_TIMEOUT_SECONDS=30
     restart: unless-stopped
     networks:
